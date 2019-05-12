@@ -14,7 +14,9 @@
   width: 50% !important;
 }
 </style>
-<img src="<%= person.profilePic %>" width="100px" height="100px">
+<a href="/protected/view">See all alumni</a><br/>
+<img src="<%= person.profilePic %>" width="100px" height="100px"><br/>
+<input type="text" id="profile-pic"><br/>
 <h1><%= person.firstName %> <%= person.middleName %> <%= person.lastName %> 
   (<%= person.gradYear %>)</h1>
 
@@ -23,7 +25,7 @@
 <p><strong>Penn/Philo Career:</strong><%= person.pennCareer %></p>
 <br/>
 <p><strong>Post Penn Career:</strong><%= person.postPennCareer %></p>
-<p><strong>Correspondences:</strong>
+<p><strong>Correspondences (<a href="/protected/alumni/<%= person._id %>/add-correspondence">Add Correspondence</a>):</strong>
 <ul>
     <% for (var i = 0; i < person.correspondences.length; i++) { %>
     <li><a href="/protected/alumni/view-correspondence/<%=person.correspondences[i]._id%>">Link</a>: 

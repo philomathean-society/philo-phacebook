@@ -43,29 +43,49 @@ router.post('/alumni/:id/update-comments', (req, res) => {
   })
 })
 
-router.get('/alumni/:id/add-correspondence', (req, res) => {
+router.get('/alumni/:id/add-correspondence/:corrId?', (req, res) => {
+  var e =  {};
   Alumni.findById(req.params.id, function(err, resp) {
-    res.render('add-correspondence', { person: resp })
+    if (req.params.corrId) {
+      Corr.findById(req.params.corrId, function(err, corr) {
+        if (corr) { e = corr }
+        return res.render('add-correspondence', { person: resp, e })
+      })
+    } else {
+      res.render('add-correspondence', { person: resp, e })
+    }
   });
 })
 
-router.post('/alumni/:id/add-correspondence', (req, res) => {
+router.post('/alumni/:id/add-correspondence/:corrId?', (req, res) => {
   let { corrTitle, text, dateCorresponded, attachmentLink } = req.body;
-  var c = new Corr({
-    alumniId: req.params.id,
-    corrTitle, 
-    text,
-    dateCorresponded,
-    attachmentLink
-  })
-  Alumni.findById(req.params.id, function(err, resp) {
-    c.save(function(err, res2) {
-      resp.correspondences.push(res2._id);
-      resp.save(function(err, final) {
-        res.render('add-correspondence', { person: resp })
+  if (!req.body.edit) {
+    var c = new Corr({
+      alumniId: req.params.id,
+      corrTitle, 
+      text,
+      dateCorresponded,
+      attachmentLink
+    })
+    Alumni.findById(req.params.id, function(err, resp) {
+      c.save(function(err, res2) {
+        resp.correspondences.push(res2._id);
+        resp.save(function(err, final) {
+          res.redirect('/protected/alumni/view-correspondence/' + final._id)
+        });
+      })
+    });
+  } else {
+    Corr.findById(req.body.edit, function(err, r) {
+      r.corrTitle = corrTitle;
+      r.text = text;
+      r.dateCorresponded = dateCorresponded;
+      r.attachmentLink = attachmentLink;
+      r.save(function(err, s) {
+        res.redirect('/protected/alumni/view-correspondence/' + s._id)
       });
     })
-  });
+  }
 })
 
 router.get('/alumni/view-correspondence/:id', (req, res) => {

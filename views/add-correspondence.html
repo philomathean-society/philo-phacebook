@@ -10,7 +10,7 @@
 }
 </style>
 <form method="POST">
-  Title of Correspondence: <input type="text" name="corrTitle"><br/>
+  Title of Correspondence: <input type="text" name="corrTitle" value="<%= e.corrTitle %>"><br/>
   Text of Correspondence (keep images below 10 mb): 
     <div id="quill-contain">
       <div id="editor">
@@ -19,16 +19,25 @@
     <br/><br/>
     <input type="hidden" name="text"><br/>
 
-  Date: <input type="text" name="dateCorresponded" id="datepicker">
+  Date: <input type="text" name="dateCorresponded" id="datepicker" value="<%= e.dateCorresponded %>">
   Add Attachment Link (note link must be publicly accessible): 
   <input type="text" id="attachment"><button id="add-attachment">Add attachment link</button>
   <div id="attachments">
   </div>
-  <input type="hidden" name="attachmentLink">
+  <input type="hidden" name="attachmentLink" value="<%= e.attachmentLink %>">
+  <% if (Object.keys(e).length > 0) { %>
+  <input type="hidden" name="edit" value="<%= e._id %>">
+  <% } %>
   <button type="submit" id="submit-form">ADD CORRESPONDENCE</button>
 </form>
 
   <script>
+  var attachments = [];
+  function addAttachmentLink(link) {
+    $('#attachments').append(`<li data-link="${link}"><a href="${link}">${link}</a> 
+      <button id="delete-attachment">Delete attachment</button></li>`)
+    attachments.push(link);
+  }
   var toolbarOptions = [['header', 'bold', 'italic'], ['link', 'image']];
   var quill = new Quill('#editor', {
     modules: {
@@ -36,15 +45,21 @@
     },
     theme: 'snow',
   });
-  var attachments = [];
+  <% if (e.text) { %>
+      quill.root.innerHTML = '<%-JSON.parse(e.text)%>'
+  <% } %>
+  <% if (e.attachmentLink) { %>
+      <% var c = e.attachmentLink.split(','); %>
+      <% for (i in c) { %>
+          addAttachmentLink("<%= c[i] %>");
+      <% } %>
+  <% } %>
   $(document).ready(function() {
     $("#datepicker").datepicker();
     $('#add-attachment').on('click', function(e) {
       e.preventDefault();
       var link = $('#attachment').val();
-      attachments.push(link);
-      $('#attachments').append(`<li data-link="${link}"><a href="${link}">${link}</a> 
-        <button id="delete-attachment">Delete attachment</button></li>`)
+      addAttachmentLink(link);
     });
     $('#attachments').on('click', '#delete-attachment', function(e) {
       e.preventDefault();
