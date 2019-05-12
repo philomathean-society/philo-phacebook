@@ -1,0 +1,21 @@
+{
+  "name": "philo-alumni-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "cookie-session": "^1.3.3",
+    "ejs": "^2.6.1",
+    "express": "^4.16.4",
+    "mongoose": "^5.4.21"
+  },
+  "devDependencies": {
+    "nodemon": "^1.19.0"
+  }
+}

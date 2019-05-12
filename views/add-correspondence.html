@@ -1,0 +1,67 @@
+<script src="/static/jquery.min.js"></script>
+<link href="/static/quill.snow.css" rel="stylesheet">
+<script src="/static/quill.js"></script>
+<link rel="stylesheet" href="/static/jquery-ui.css">
+<script src="/static/jquery-ui.js"></script>
+<style>
+#quill-contain {
+  width: 50%;
+  height: 300px;
+}
+</style>
+<form method="POST">
+  Title of Correspondence: <input type="text" name="corrTitle"><br/>
+  Text of Correspondence (keep images below 10 mb): 
+    <div id="quill-contain">
+      <div id="editor">
+      </div>
+    </div>
+    <br/><br/>
+    <input type="hidden" name="text"><br/>
+
+  Date: <input type="text" name="dateCorresponded" id="datepicker">
+  Add Attachment Link (note link must be publicly accessible): 
+  <input type="text" id="attachment"><button id="add-attachment">Add attachment link</button>
+  <div id="attachments">
+  </div>
+  <input type="hidden" name="attachmentLink">
+  <button type="submit" id="submit-form">ADD CORRESPONDENCE</button>
+</form>
+
+  <script>
+  var toolbarOptions = [['header', 'bold', 'italic'], ['link', 'image']];
+  var quill = new Quill('#editor', {
+    modules: {
+      toolbar: toolbarOptions
+    },
+    theme: 'snow',
+  });
+  var attachments = [];
+  $(document).ready(function() {
+    $("#datepicker").datepicker();
+    $('#add-attachment').on('click', function(e) {
+      e.preventDefault();
+      var link = $('#attachment').val();
+      attachments.push(link);
+      $('#attachments').append(`<li data-link="${link}"><a href="${link}">${link}</a> 
+        <button id="delete-attachment">Delete attachment</button></li>`)
+    });
+    $('#attachments').on('click', '#delete-attachment', function(e) {
+      e.preventDefault();
+      var link = $(this).parent().attr('data-link');
+      var index = attachments.indexOf(link);
+      if (index > -1) {
+        attachments.splice(link, 1);
+      }
+      $(this).parent().remove();
+      return false;
+    });
+    $('#submit-form').on('click', function(e) {
+      e.preventDefault();
+      var content = JSON.stringify(quill.root.innerHTML);
+      $('input[name="text"]').val(content);
+      $('input[name="attachmentLink"]').val(attachments.join(','));
+      $('form').submit();
+    });
+  });
+  </script>

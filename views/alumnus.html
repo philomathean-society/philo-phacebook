@@ -1,0 +1,104 @@
+<script src="/static/jquery.min.js"></script>
+<link href="/static/quill.snow.css" rel="stylesheet">
+<script src="/static/quill.js"></script>
+<style>
+#comments, #disp-comments {
+  width: 50%;
+  height: 300px;
+}
+#disp-comments  img{
+  max-width: 100%; 
+  max-height: 300px;
+}
+.ql-toolbar {
+  width: 50% !important;
+}
+</style>
+<img src="<%= person.profilePic %>" width="100px" height="100px">
+<h1><%= person.firstName %> <%= person.middleName %> <%= person.lastName %> 
+  (<%= person.gradYear %>)</h1>
+
+<h3>Admitted into Philo <%= person.admitYear %></h3>
+
+<p><strong>Penn/Philo Career:</strong><%= person.pennCareer %></p>
+<br/>
+<p><strong>Post Penn Career:</strong><%= person.postPennCareer %></p>
+<p><strong>Correspondences:</strong>
+<ul>
+    <% for (var i = 0; i < person.correspondences.length; i++) { %>
+    <li><a href="/protected/alumni/view-correspondence/<%=person.correspondences[i]._id%>">Link</a>: 
+      <%= person.correspondences[i].corrTitle %> 
+      (<%= person.correspondences[i].dateCorresponded %>)</li>
+  <% } %>
+</ul>
+<p><strong>General Comments</strong> (add more by clicking "Edit"):<br>
+<div id="disp-comments" style="display: block"></div>
+<div id="comments-container">
+<div id="comments"></div>
+</div>
+<br/>
+<button id="edit">Edit</button>
+
+</p>
+  <script>
+    <% try { (JSON.parse(person.genComments)); %>
+        var quillContent = JSON.parse(<%-JSON.stringify(person.genComments) %>)
+    <% } catch { %>
+        alert("Malformed string");
+        var quillContent = ''
+    <% } %>
+
+  var toolbarOptions = [['header', 'bold', 'italic'], ['link', 'image']
+  ];
+  var quill = new Quill('#comments', {
+    modules: {
+      toolbar: toolbarOptions
+    },
+    theme: 'snow',
+  });
+  quill.setContents(quillContent, 'api');
+  $('#disp-comments').html(quill.root.innerHTML);
+  var editMode = false;
+
+  function hideQuill() {
+    $('#disp-comments').css('display', 'block');
+    $('#disp-comments').html(quill.root.innerHTML);
+    $('#comments-container').css('display', 'none');
+  }
+
+  function showQuill() {
+    $('#comments-container').css('display', 'block');;
+    $('#disp-comments').css('display', 'none');;
+    quill.setContents(quillContent, 'api');
+    quill.enable();
+  }
+  $(document).ready(function() {
+    hideQuill();
+    $('#disp-comments').html(quill.root.innerHTML);
+    $('#edit').on('click', function () {
+      if (editMode == true) {
+        quillContent = quill.getContents();
+      }
+
+      editMode = !editMode;
+      if (editMode == true) {
+        showQuill();
+        $('#edit').text('Submit edit');
+      } else {
+        fetch('/protected/alumni/<%= person._id %>/update-comments', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            comment: JSON.stringify(quillContent)
+          })
+        }).then(res => res.json()).then(res => {
+          if (res.status != 'success') { alert('Error: Could not save') }
+          $('#edit').text('Edit');
+          hideQuill();
+        }).catch(err => alert(`Error: ${err.message}`));
+      }
+    })
+  })
+  </script>

@@ -1,0 +1,72 @@
+<script src="/static/papaparse.min.js"></script>
+<h1>Hi there</h1>
+
+<h3>Update Sheet:</h3>
+<p>Needs the following fields:</p>
+<li>ID</li>
+<li>Year Admitted</li>
+<li>Semester Admitted (either "Fall" for Fall or "1Spring" for 1Spring)</li>
+<li>Date Admitted</li>
+<li>FirstName</li>
+<li>Middle Name(s)</li>
+<li>Last Name (at Admission)</li>
+<li>Last Name (Today)</li>
+<li>PostNom.</li>
+<li>School</li>
+<li>Grad Year</li>
+<li>Member Type at Admission (Junior</li>
+<li>Special</li>
+<li>Passive)</li>
+<li>Post-Grad Member Class (Senior</li>
+<li>Nominal)</li>
+<li>Major/Concentration</li>
+<li>Philo/Penn Career</li>
+<li>Post-Philo Career</li>
+<li>Transcriber's Notes</li>
+<li>Check</li>
+<li>Sources</li>
+
+<p>Add file here:</p>
+<input type="file" id="f"/><br/>
+Updated <span id="total">0</span> of <span id="all">0</span> entries.
+  <script>
+    var results = [];
+    var fiftyStart = 0;
+    var totalCount = 0;
+    var allCount = 0;
+    document.getElementById('f').addEventListener("change", function (evt) {
+      var file = this.files[0];
+      Papa.parse(file, {
+        complete: function(results) {
+          results.data = results.data.sort((a, b) => a['Year Admitted'] - b['Year Admitted'])
+          for (r in results.data) {
+            if (results.data[r]['Year Admitted'] >= 1950) {
+              fiftyStart = r;
+              break;
+            }
+          }
+          results = results.data.slice(fiftyStart);
+          // results = [results[0]]
+          allCount = results.length;
+          results.forEach((i) => {
+            fetch("/protected/update-sheet", {
+              method: 'POST',
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(i)
+            }).then(res => res.json())
+              .then((res) => {
+                totalCount++;
+                updateTotalCount();
+              })
+          });
+        },
+        header: true
+      });
+    }, false);
+    function updateTotalCount() {
+      document.getElementById("total").textContent = totalCount;
+      document.getElementById("all").textContent = allCount;
+    }
+  </script>

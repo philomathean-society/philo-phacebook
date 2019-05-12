@@ -1,0 +1,15 @@
+Correspondence with <%= corr.alumniId.firstName %> <%= corr.alumniId.lastName %><br/>
+<a href="/protected/alumni/<%= corr.alumniId._id %>">Go back</a>
+
+<br/>
+
+<b>Title:</b><%= corr.corrTitle %><br/>
+<b>Date:</b><%= corr.dateCorresponded %><br/>
+<b>Attachment Links:</b>
+<% var c = corr.attachmentLink.split(','); %>
+<% for (i in c) { %>
+<li><a href="<%= c[i] %>"><%= c[i] %></a></li>
+<% } %>
+<br/>
+<b>Text:</b><br/>
+<%- JSON.parse(corr.text) %>

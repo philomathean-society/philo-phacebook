@@ -1,0 +1,95 @@
+<script src="/static/jquery.min.js"></script>
+<script src="/static/fuse.min.js"></script>
+<style>
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th, td {
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even){background-color: #f2f2f2}
+
+th {
+  background-color: #4CAF50;
+  color: white;
+}
+</style>
+</style>
+Search all fields: <input type="text" id="any"><br/>
+<div style="overflow-x:auto;">
+<table id="table">
+</table>
+</div>
+
+  <script>
+    var people = <%- JSON.stringify(people) %>
+    console.log(people);
+    function debounce(func, wait, immediate) {
+      var timeout;
+      return function() {
+        var context = this, args = arguments;
+        var later = function() {
+          timeout = null;
+          if (!immediate) func.apply(context, args);
+        };
+        var callNow = immediate && !timeout;
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+        if (callNow) func.apply(context, args);
+      };
+    };
+    $(document).ready(function() {
+      renderTable(people);
+      var options = {
+      keys: ['firstName', 'lastName', 'middleName', 'gradYear', 'admitYear', 
+            'postPennCareer', 'pennCareer' ]
+      }
+      var fuse = new Fuse(people, options)
+
+      $('#any').on('keyup', debounce(function() {
+        if ($('#any').val().length > 3) {
+          var res = fuse.search($('#any').val());
+          console.log(res.slice(0, 50));
+          renderTable(res.slice(0, 50));
+        } else if ($('#any').val().length == 0) {
+          renderTable(people);
+        }
+      }, 500));
+    })
+
+    function renderTable(data) {
+      var people = data;
+      $('tr').remove();
+      $('#table').append(`
+                         <tr>
+                         <th>View</th>
+                         <th>Admit Year</th>
+                         <th>First Name</th>
+                         <th>Middle Name</th>
+                         <th>Last Name</th>
+                         <th>Grad Year</th>
+                         <th>Penn Career</th>
+                         <th>Post Penn Career</th>
+                         <th>Tag</th>
+                         </tr>
+                         `);
+      for (p in people) {
+        $('#table').append(`<tr>
+                          <td><a href="/protected/alumni/${people[p]._id}">View</a></td>
+                          <td>${people[p].admitYear}</td>
+                          <td>${ people[p].firstName }</td>
+                          <td>${ people[p].middleName }</td>
+                          <td>${ people[p].lastName }</td>
+                          <td>${ people[p].gradYear }</td>
+                          <td>${ people[p].pennCareer }</td>
+                          <td>${ people[p].postPennCareer }</td>
+                          <td>${ people[p].tag }</td>
+                          </tr>
+        `);
+      }
+    }
+  </script>
