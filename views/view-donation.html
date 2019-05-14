@@ -1,20 +1,20 @@
 <%- include('partials/head.html') %>
 <%- include('partials/header.html') %>
-<h1 class="title is-h1">Correspondence with <%= corr.alumniId.firstName %> <%= corr.alumniId.lastName %></h1>
+<h1 class="title is-h1">Donation from <%= corr.alumniId.firstName %> <%= corr.alumniId.lastName %></h1>
 <a class="button" href="/protected/alumni/<%= corr.alumniId._id %>">Go back to profile</a>
-<a class="button" href="/protected/alumni/<%= corr.alumniId._id %>/add-correspondence/<%= corr._id %>">Edit Correspondence</a>
+<a class="button" href="/protected/alumni/<%= corr.alumniId._id %>/add-donation/<%= corr._id %>">Edit Donation</a>
 
 <br/>
 <br/><br/>
-<b class="heading">Title:</b><%= corr.corrTitle %><br/><br/><br/>
-<b class="heading">Date:</b><%= corr.dateCorresponded %><br/><br/><br/>
+<b class="heading">Amount Donated:</b><%= corr.donationAmount %><br/><br/><br/>
+<b class="heading">Date:</b><%= corr.dateDonated %><br/><br/><br/>
 <b class="heading">Attachment Links:</b>
 <% var c = corr.attachmentLink.split(','); %>
 <% for (i in c) { %>
 <li><a href="<%= c[i] %>"><%= c[i] %></a></li>
 <% } %>
 <br/><br/><br/>
-<b class="heading">Text:</b><br/>
+<b class="heading">Purpose:</b><br/><br/><br/>
 <div class="disp-container">
 <%- JSON.parse(corr.text) %>
 </div>

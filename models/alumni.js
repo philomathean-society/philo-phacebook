@@ -11,7 +11,7 @@ const alumniSchema = new mongoose.Schema({
   postPennCareer: { type: String },
   genComments: { type: String },
   profilePic: { type: String },
-  tag: { type: String },
+  tags: [{ type: Schema.Types.ObjectId, ref: 'Tag' }],
   correspondences: [{ type: Schema.Types.ObjectId, ref: 'Correspondence' }],
   donations: [{ type: Schema.Types.ObjectId, ref: 'Donation' }]
 });

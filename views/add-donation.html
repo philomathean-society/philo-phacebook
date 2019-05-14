@@ -1,12 +1,14 @@
 <%- include('partials/head.html') %>
 <%- include('partials/header.html') %>
+<style>
+</style>
 <form method="POST">
   <div class="field">
     <label class="label">
-      Title of Correspondence: 
+      Amount of Donation (estimate value if non-monetary) ONLY A NUMBER: 
     </label>
     <div class="control">
-      <input class="input" type="text" name="corrTitle" value="<%= e.corrTitle %>">
+      <input class="input" type="text" name="donationAmount" value="<%= e.donationAmount %>">
     </div>
   </div>
   <div class="field">
@@ -14,12 +16,12 @@
     Date: 
     </label>
     <div class="control">
-      <input class="input" type="text" name="dateCorresponded" id="datepicker" value="<%= e.dateCorresponded %>">
+      <input class="input" type="text" name="dateDonated" id="datepicker" value="<%= e.dateDonated %>">
     </div>
   </div>
   <div class="field">
   <label class="label">
-    Text of Correspondence(link images > 2 mb in attachments section): 
+    Purpose of Donation + Any other info (e.g. if it is recurring) (link images > 2 mb in attachments section): 
   </label>
     <div id="quill-contain">
       <div id="editor">
@@ -43,9 +45,9 @@
     <div class="control">
     <% if (Object.keys(e).length > 0) { %>
     <input type="hidden" name="edit" value="<%= e._id %>">
-    <button class="button is-link" type="submit" id="submit-form">EDIT CORRESPONDENCE</button>
+    <button class="button is-link" type="submit" id="submit-form">EDIT DONATION</button>
     <% } else { %>
-    <button class="button is-link" type="submit" id="submit-form">ADD CORRESPONDENCE</button>
+    <button class="button is-link" type="submit" id="submit-form">ADD DONATION</button>
     <% } %>
     </div>
   </div>

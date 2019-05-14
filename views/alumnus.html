@@ -1,106 +1,226 @@
-<script src="/static/jquery.min.js"></script>
-<link href="/static/quill.snow.css" rel="stylesheet">
-<script src="/static/quill.js"></script>
+<%- include('partials/head.html') %>
+<%- include('partials/header.html') %>
 <style>
-#comments, #disp-comments {
-  width: 50%;
-  height: 300px;
+#comments-container, #disp-comments {
+  width: 100%;
 }
 #disp-comments  img{
   max-width: 100%; 
   max-height: 300px;
 }
-.ql-toolbar {
-  width: 50% !important;
-}
 </style>
-<a href="/protected/view">See all alumni</a><br/>
-<img src="<%= person.profilePic %>" width="100px" height="100px"><br/>
-<input type="text" id="profile-pic"><br/>
-<h1><%= person.firstName %> <%= person.middleName %> <%= person.lastName %> 
-  (<%= person.gradYear %>)</h1>
-
-<h3>Admitted into Philo <%= person.admitYear %></h3>
-
-<p><strong>Penn/Philo Career:</strong><%= person.pennCareer %></p>
-<br/>
-<p><strong>Post Penn Career:</strong><%= person.postPennCareer %></p>
-<p><strong>Correspondences (<a href="/protected/alumni/<%= person._id %>/add-correspondence">Add Correspondence</a>):</strong>
-<ul>
-    <% for (var i = 0; i < person.correspondences.length; i++) { %>
-    <li><a href="/protected/alumni/view-correspondence/<%=person.correspondences[i]._id%>">Link</a>: 
-      <%= person.correspondences[i].corrTitle %> 
-      (<%= person.correspondences[i].dateCorresponded %>)</li>
-  <% } %>
-</ul>
-<p><strong>General Comments</strong> (add more by clicking "Edit"):<br>
-<div id="disp-comments" style="display: block"></div>
-<div id="comments-container">
-<div id="comments"></div>
-</div>
-<br/>
-<button id="edit">Edit</button>
-
-</p>
-  <script>
-    <% try { (JSON.parse(person.genComments)); %>
-        var quillContent = JSON.parse(<%-JSON.stringify(person.genComments) %>)
-    <% } catch { %>
-        alert("Malformed string");
-        var quillContent = ''
+<div class="columns">
+  <div class="column is-4">
+    <div class="card">
+      <div class="card-image">
+        <figure class="image is-1by1">
+          <% if (!person.profilePic) { %>
+          <img class="img-prof" src="/static/philo.png" alt="Placeholder image">
+          <% } else { %>
+          <img class="img-prof" src="<%= person.profilePic %>">
+          <% } %>
+        </figure>
+      </div>
+      <div class="card-content">
+        <div class="content">
+          <p class="title is-4">
+          <%= person.firstName %> <%= person.middleName %> <%= person.lastName %> 
+          </p>
+          <p class="title is-6">
+          Graduated <%= person.gradYear %>
+          </p>
+          <div class="field">
+            <label class="label">Update Image Link</label>
+            <div class="control">
+              <input class="input" type="text" id="profile-pic" 
+                                 value="<%= person.profilePic %>">
+            </div>
+          </div>
+          <div class="field is-grouped">
+            <div class="control">
+              <button class="button is-link" id="update-prof">Update</button>
+            </div>
+          </div>
+          <div class="field">
+            <label class="label">Add Tag</label>
+            <div class="control is-extended">
+              <input class="input" id="tag-type" type="text">
+            </div>
+          </div>
+          <div class="field is-grouped">
+            <div class="control">
+              <button id="add-tag" class="button is-link">Add tag</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="column">
+    <h1 class="title is-h1">Info</h1>
+    <p><strong class="heading is-h3">Tags</strong>
+          <div  class="field is-grouped is-grouped-multiline">
+            <% for (var i = 0; i < person.tags.length; i++) { %>
+            <div class="control">
+              <div class="tags has-addons">
+                <span class="tag is-danger"><%=person.tags[i].tagName%></span>
+                <a class="tag is-delete" 
+                   href="/protected/alumni/<%=person._id%>/remove-tag/<%=person.tags[i]._id%>"></a>
+              </div>
+            </div>
+            <% } %>
+          </div>
+    <br/>
+    <p><strong class="heading is-h3">General Comments</strong> (add more by clicking "Edit"):<br>
+    <div id="disp-comments" style="display: block"></div>
+    <div id="comments-container">
+    <div id="comments"></div>
+    </div>
+    <br/>
+    <button class="button" id="edit">Edit Comments</button>
+    <br/>
+    <br/>
+    <p><strong class="heading is-h3">Penn/Philo Career:</strong>
+    <br/>
+    Admitted into Philo <%= person.admitYear %>.
+    <%= person.pennCareer %></p>
+    <br/>
+    <p><strong class="heading is-h3">Post Penn Career:</strong><br/>
+    <% if (person.postPennCareer) { %>
+      <%= person.postPennCareer %>
+    <% } else { %>
+      No Info
     <% } %>
+    </p>
+    <br/>
+      <p><strong class="heading is-h3">Correspondences (<a href="/protected/alumni/<%= person._id %>/add-correspondence">Add Correspondence</a>):</strong>
+      <table class="table" style="width: 100%">
+        <thead>
+          <tr>
+            <th>Link</th>
+            <th>Delete</th>
+            <th>Title of Correspondence</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <% for (var i = 0; i < person.correspondences.length; i++) { %>
+          <tr>
+            <td><a href="/protected/alumni/view-correspondence/<%=person.correspondences[i]._id%>">View/Edit</a></td>
+              <td><a href="/protected/alumni/delete-correspondence/<%=person.correspondences[i]._id%>">Delete</a></td>
+              <td><%= person.correspondences[i].corrTitle %></td>
+              <td><%= person.correspondences[i].dateCorresponded %></td>
+          </tr>
+        <% } %>
+      </table>
+        <p><strong class="heading is-h3">Donations (<a href="/protected/alumni/<%= person._id %>/add-donation">Add Donation</a>):</strong>
+        <table class="table" style="width: 100%">
+          <thead>
+            <tr>
+              <th>Link</th>
+              <th>Delete</th>
+              <th>Amount of Donation</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+            <% for (var i = 0; i < person.donations.length; i++) { %>
+            <tr>
+              <td><a href="/protected/alumni/view-donation/<%=person.donations[i]._id%>">View/Edit</a></td>
+              <td> <a href="/protected/alumni/delete-donation/<%=person.donations[i]._id%>">Delete</a></td>
+              <td> $<%= person.donations[i].donationAmount %></td> 
+              <td> (<%= person.donations[i].dateDonated %>)</td>
+            </tr>
+          <% } %>
+        </table>
 
-  var toolbarOptions = [['header', 'bold', 'italic'], ['link', 'image']
-  ];
-  var quill = new Quill('#comments', {
-    modules: {
-      toolbar: toolbarOptions
-    },
-    theme: 'snow',
-  });
-  quill.setContents(quillContent, 'api');
-  $('#disp-comments').html(quill.root.innerHTML);
-  var editMode = false;
+    </p>
+  </div>
+    <script>
+    var tagList = <%- JSON.stringify(tags) %>
+    console.log(tagList);
+      <% try { (JSON.parse(person.genComments)); %>
+          var quillContent = JSON.parse(<%-JSON.stringify(person.genComments) %>)
+      <% } catch { %>
+          var quillContent = ''
+      <% } %>
 
-  function hideQuill() {
-    $('#disp-comments').css('display', 'block');
-    $('#disp-comments').html(quill.root.innerHTML);
-    $('#comments-container').css('display', 'none');
-  }
-
-  function showQuill() {
-    $('#comments-container').css('display', 'block');;
-    $('#disp-comments').css('display', 'none');;
+    var toolbarOptions = [['header', 'bold', 'italic'], ['link', 'image']
+    ];
+    var quill = new Quill('#comments', {
+      modules: {
+        toolbar: toolbarOptions
+      },
+      theme: 'snow',
+    });
     quill.setContents(quillContent, 'api');
-    quill.enable();
-  }
-  $(document).ready(function() {
-    hideQuill();
     $('#disp-comments').html(quill.root.innerHTML);
-    $('#edit').on('click', function () {
-      if (editMode == true) {
-        quillContent = quill.getContents();
-      }
+    var editMode = false;
 
-      editMode = !editMode;
-      if (editMode == true) {
-        showQuill();
-        $('#edit').text('Submit edit');
-      } else {
-        fetch('/protected/alumni/<%= person._id %>/update-comments', {
+    function hideQuill() {
+      $('#disp-comments').css('display', 'block');
+      $('#disp-comments').html(quill.root.innerHTML);
+      $('#comments-container').css('display', 'none');
+    }
+
+    function showQuill() {
+      $('#comments-container').css('display', 'block');;
+      $('#disp-comments').css('display', 'none');;
+      quill.setContents(quillContent, 'api');
+      quill.enable();
+    }
+    $(document).ready(function() {
+      hideQuill();
+      $('#update-prof').on('click', function() {
+        fetch('/protected/alumni/<%= person._id %>/update-profile', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({
-            comment: JSON.stringify(quillContent)
-          })
-        }).then(res => res.json()).then(res => {
-          if (res.status != 'success') { alert('Error: Could not save') }
-          $('#edit').text('Edit');
-          hideQuill();
-        }).catch(err => alert(`Error: ${err.message}`));
-      }
+          body: JSON.stringify({ link: $('#profile-pic').val() })
+        }).then(res => location.reload(true));
+      });
+      $('#disp-comments').html(quill.root.innerHTML);
+      $('#edit').on('click', function () {
+        if (editMode == true) {
+          quillContent = quill.getContents();
+        }
+
+        editMode = !editMode;
+        if (editMode == true) {
+          showQuill();
+          $('#edit').text('Submit edit');
+        } else {
+          fetch('/protected/alumni/<%= person._id %>/update-comments', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              comment: JSON.stringify(quillContent)
+            })
+          }).then(res => res.json()).then(res => {
+            if (res.status != 'success') { alert('Error: Could not save') }
+            $('#edit').text('Edit Comments');
+            hideQuill();
+          }).catch(err => alert(`Error: ${err.message}`));
+        }
+      })
+    var tl = tagList.map(i => i.tagName);
+    $( "#tag-type" ).autocomplete({
+      source: tl
+    });
+      $('#add-tag').on('click', function () { 
+        console.log();
+          fetch('/protected/alumni/<%= person._id %>/add-tag', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              t: $('#tag-type').val()
+            })
+          }).then(res => res.json()).then(res => location.reload(true))
+      })
     })
-  })
-  </script>
+    </script>
+</div>
+<%- include('partials/footer.html') %>

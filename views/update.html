@@ -1,4 +1,5 @@
-<script src="/static/papaparse.min.js"></script>
+<%- include('partials/head.html') %>
+<%- include('partials/header.html') %>
 <h1>Hi there</h1>
 
 <h3>Update Sheet:</h3>
@@ -70,3 +71,4 @@ Updated <span id="total">0</span> of <span id="all">0</span> entries.
       document.getElementById("all").textContent = allCount;
     }
   </script>
+<%- include('partials/footer.html') %>

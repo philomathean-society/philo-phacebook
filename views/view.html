@@ -1,27 +1,15 @@
-<script src="/static/jquery.min.js"></script>
-<script src="/static/fuse.min.js"></script>
-<style>
-table {
-  border-collapse: collapse;
-  width: 100%;
-}
+<%- include('partials/head.html') %>
+<%- include('partials/header.html') %>
+<div class="field">
+  <label class="label">Search all names:</label>
+  <div class="control">
+    <input class="input" id="any" type="text" placeholder="Type name, year, other info">
+  </div>
+</div>
 
-th, td {
-  text-align: left;
-  padding: 8px;
-}
-
-tr:nth-child(even){background-color: #f2f2f2}
-
-th {
-  background-color: #4CAF50;
-  color: white;
-}
-</style>
-</style>
-Search all fields: <input type="text" id="any"><br/>
 <div style="overflow-x:auto;">
-<table id="table">
+<table id="table" class="table is-striped">
+
 </table>
 </div>
 
@@ -46,7 +34,7 @@ Search all fields: <input type="text" id="any"><br/>
       renderTable(people);
       var options = {
       keys: ['firstName', 'lastName', 'middleName', 'gradYear', 'admitYear', 
-            'postPennCareer', 'pennCareer' ]
+            'postPennCareer', 'pennCareer', 'tags']
       }
       var fuse = new Fuse(people, options)
 
@@ -63,10 +51,13 @@ Search all fields: <input type="text" id="any"><br/>
 
     function renderTable(data) {
       var people = data;
-      $('tr').remove();
+      $('table').empty();
+      
       $('#table').append(`
+                         <thead>
                          <tr>
                          <th>View</th>
+                         <th>Tag</th>
                          <th>Admit Year</th>
                          <th>First Name</th>
                          <th>Middle Name</th>
@@ -74,12 +65,16 @@ Search all fields: <input type="text" id="any"><br/>
                          <th>Grad Year</th>
                          <th>Penn Career</th>
                          <th>Post Penn Career</th>
-                         <th>Tag</th>
                          </tr>
+                         </thead>
                          `);
       for (p in people) {
         $('#table').append(`<tr>
                           <td><a href="/protected/alumni/${people[p]._id}">View</a></td>
+                          <td>${people[p].tags ? people[p].tags.map(i => { 
+                             return `<span class="tag is-primary">${i.tagName}</span>`
+                           }).join('') : 'None'}
+                          </td>
                           <td>${people[p].admitYear}</td>
                           <td>${ people[p].firstName }</td>
                           <td>${ people[p].middleName }</td>
@@ -87,9 +82,9 @@ Search all fields: <input type="text" id="any"><br/>
                           <td>${ people[p].gradYear }</td>
                           <td>${ people[p].pennCareer }</td>
                           <td>${ people[p].postPennCareer }</td>
-                          <td>${ people[p].tag }</td>
                           </tr>
         `);
       }
     }
   </script>
+<%- include('partials/footer.html') %>
