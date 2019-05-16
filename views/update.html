@@ -50,17 +50,15 @@ Updated <span id="total">0</span> of <span id="all">0</span> entries.
           // results = [results[0]]
           allCount = results.length;
           results.forEach((i) => {
-            fetch("/protected/update-sheet", {
+            $.ajax({
+              url: "/protected/update-sheet",
               method: 'POST',
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(i)
-            }).then(res => res.json())
-              .then((res) => {
+              body: i,
+              success: function(d) {
                 totalCount++;
                 updateTotalCount();
-              })
+              }
+            })
           });
         },
         header: true
