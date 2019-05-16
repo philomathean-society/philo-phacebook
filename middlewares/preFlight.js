@@ -1,5 +1,6 @@
 var Log = require('../models/log.js');
 var preFlight = function (req, res, next) {
+  console.log(req.session);
   if (req.url.indexOf('update') > -1 || req.url.indexOf('add') > -1 ||
       req.url.indexOf('delete') > -1 || req.url.indexOf('remove') > -1) {
     var l = new Log({
