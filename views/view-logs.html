@@ -1,0 +1,12 @@
+<%- include('partials/head.html') %>
+<%- include('partials/header.html') %>
+<h1 class="title is-h1">Logs</h1>
+<% for (var i = 0; i < logs.length; i++) { %>
+<li> 
+  <%= logs[i].time %> | <%= logs[i].type %> | <%= logs[i].author %> | 
+  <a href="<%= logs[i].url%>"><%= logs[i].url %></a> |
+  <% if (logs[i].body.length > 0) { %>
+    <a href="/protected/logs/view-log/<%= logs[i]._id %>">View more Info!</a>
+  <% } %>
+<% } %>
+<%- include('partials/footer.html') %>

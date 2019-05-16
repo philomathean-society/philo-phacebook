@@ -1,2 +1,13 @@
 </div>
+  <script>
+document.addEventListener('DOMContentLoaded', () => {
+  (document.querySelectorAll('.notification .delete') || []).forEach(($delete) => {
+    $notification = $delete.parentNode;
+    setTimeout(function() {
+      fetch('/delete-message').then(res=>res.json).then(res =>
+      $notification.parentNode.removeChild($notification))
+    }, 3000);
+  });
+});
+  </script>
 </body>

@@ -19,25 +19,29 @@
         View all alumni
       </a>
 
+      <a class="navbar-item" href="/protected/update">
+        Update Sheet
+      </a>
+      <a class="navbar-item" href="/protected/logs">
+        View Logs
+      </a>
 
-      <div class="navbar-item has-dropdown is-hoverable">
-        <a class="navbar-link">
-          Configure App
-        </a>
-
-        <div class="navbar-dropdown">
-          <a class="navbar-item" href="/protected/update">
-            Update Sheet
-          </a>
-          <a class="navbar-item" href="/account/signup">
-            Add Other Editors
-          </a>
-        </div>
-      </div>
     </div>
 
     <div class="navbar-end">
       <div class="navbar-item">
+        <% if (locals.user) { %>
+          Hi <%= locals.user.username %> 
+        </div>
+        <div class="navbar-item">
+        <div class="buttons">
+          <a class="button is-light" href="/account/reset-password">
+            Change Password
+          </a>
+          <a class="button is-primary" href="/account/logout">
+            Log out
+          </a>
+        <% } else {%>
         <div class="buttons">
           <a class="button is-primary" href="/account/signup">
             <strong>Sign up</strong>
@@ -45,11 +49,22 @@
           <a class="button is-light" href="/account/login">
             Log in
           </a>
-          <a class="button is-light" href="/account/logout">
-            Log out
-          </a>
+        <% } %>
         </div>
       </div>
     </div>
   </div>
 </nav>
+<% if (locals.messages && locals.messages.length > 0) { %>
+  <script>
+  bulmaToast.toast({ 
+                   message: "<%= locals.messages[0].message %>", 
+                   type: "is-<%= locals.messages[0].type %>",
+                   dismissible: true,
+                   animate: { in: "fadeIn", out: "fadeOut" }
+  });
+  </script>
+<% } %>
+  <script>
+    console.log(<%- JSON.stringify(locals._locals) %>);
+  </script>

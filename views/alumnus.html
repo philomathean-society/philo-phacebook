@@ -112,7 +112,7 @@
           </tr>
         <% } %>
       </table>
-        <p><strong class="heading is-h3">Donations (<a href="/protected/alumni/<%= person._id %>/add-donation">Add Donation</a>):</strong>
+      <p><strong class="heading is-h3">Donations (Total Monetary = <%= person.donorTotal %>; <a href="/protected/alumni/<%= person._id %>/add-donation">Add Donation</a>):</strong>
         <table class="table" style="width: 100%">
           <thead>
             <tr>
@@ -126,7 +126,7 @@
             <tr>
               <td><a href="/protected/alumni/view-donation/<%=person.donations[i]._id%>">View/Edit</a></td>
               <td> <a href="/protected/alumni/delete-donation/<%=person.donations[i]._id%>">Delete</a></td>
-              <td> $<%= person.donations[i].donationAmount %></td> 
+              <td> <%= person.donations[i].donationAmount %></td> 
               <td> (<%= person.donations[i].dateDonated %>)</td>
             </tr>
           <% } %>

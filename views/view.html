@@ -1,4 +1,5 @@
 <%- include('partials/head.html') %>
+<script src="/static/sorttable.js"></script>
 <%- include('partials/header.html') %>
 <div class="field">
   <label class="label">Search all names:</label>
@@ -8,14 +9,23 @@
 </div>
 
 <div style="overflow-x:auto;">
-<table id="table" class="table is-striped">
+<table id="table" class="table is-striped sortable">
 
 </table>
+<style>
+/* Sortable tables */
+table.sortable thead {
+    background-color:#eee;
+    color:#666666;
+    font-weight: bold;
+    cursor: default;
+}
+</style>
 </div>
 
   <script>
+    var newTableObject = null;
     var people = <%- JSON.stringify(people) %>
-    console.log(people);
     function debounce(func, wait, immediate) {
       var timeout;
       return function() {
@@ -31,7 +41,9 @@
       };
     };
     $(document).ready(function() {
+      console.time('render');
       renderTable(people);
+      console.timeEnd('render');
       var options = {
       keys: ['firstName', 'lastName', 'middleName', 'gradYear', 'admitYear', 
             'postPennCareer', 'pennCareer', 'tags']
@@ -51,13 +63,16 @@
 
     function renderTable(data) {
       var people = data;
-      $('table').empty();
-      
-      $('#table').append(`
-                         <thead>
+      var t = document.querySelector('table');
+      t.innerHTML = '';
+      var c = document.createDocumentFragment();
+      var e = document.createElement("thead");
+      (e).innerHTML = `
+                      
                          <tr>
-                         <th>View</th>
+                         <th>Link</th>
                          <th>Tag</th>
+                         <th>Donation Total</th>
                          <th>Admit Year</th>
                          <th>First Name</th>
                          <th>Middle Name</th>
@@ -66,15 +81,19 @@
                          <th>Penn Career</th>
                          <th>Post Penn Career</th>
                          </tr>
-                         </thead>
-                         `);
+                         
+                         `;
+      c.appendChild(e);
+      var r = document.createElement("tbody");
       for (p in people) {
-        $('#table').append(`<tr>
+        var e2 = document.createElement('tr')
+        e2.innerHTML = `
                           <td><a href="/protected/alumni/${people[p]._id}">View</a></td>
                           <td>${people[p].tags ? people[p].tags.map(i => { 
                              return `<span class="tag is-primary">${i.tagName}</span>`
                            }).join('') : 'None'}
                           </td>
+                          <td>${people[p].donorTotal ? people[p].donorTotal : 0}</td>
                           <td>${people[p].admitYear}</td>
                           <td>${ people[p].firstName }</td>
                           <td>${ people[p].middleName }</td>
@@ -82,9 +101,22 @@
                           <td>${ people[p].gradYear }</td>
                           <td>${ people[p].pennCareer }</td>
                           <td>${ people[p].postPennCareer }</td>
-                          </tr>
-        `);
+                          
+        `;
+        r.appendChild(e2);
       }
+      c.appendChild(r);
+      t.appendChild(c);
+      newTableObject = document.getElementById('table')
+      sorttable.makeSortable(newTableObject);
     }
+    $('body').on('click', 'th', function() {
+      var by = $(this).text();
+      bulmaToast.toast({
+        message: "Sorting by " + by,
+        dismissible: true,
+        animate: { in: "fadeIn", out: "fadeOut" }
+      })
+    })
   </script>
 <%- include('partials/footer.html') %>

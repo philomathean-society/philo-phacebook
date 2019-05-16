@@ -5,13 +5,28 @@ var User = require('../models/user.js')
 var Alumni = require('../models/alumni.js');
 var Corr = require('../models/correspondence.js');
 var Tag = require('../models/tag.js');
+var Log = require('../models/log.js');
 var Donation = require('../models/donations.js');
 
 router.use(isAuthenticated); // applies to everything!
 
 router.get('/', (req, res) => {
+  console.log(req.session.messages, res.locals.messages)
   res.redirect('/protected/view'); 
 });
+
+router.get('/logs', (req, res) => {
+  Log.find({}, function(e, ls) {
+    ls.sort((a, b) => b.time - a.time);
+    res.render('view-logs', { logs: ls });
+  })
+})
+
+router.get('/logs/view-log/:id', (req, res) => {
+  Log.findById(req.params.id, function(e, ls) {
+    res.render('view-log', { log: ls._doc });
+  })
+})
 
 router.get('/view', (req, res) => {
   Alumni.find({}).populate('tags').exec(function(err, resp) {
@@ -147,7 +162,7 @@ router.post('/alumni/:id/add-donation/:corrId?', (req, res) => {
   if (!req.body.edit) {
     var c = new Donation({
       alumniId: req.params.id,
-      donationAmount: donationAmount ? donationAmount.match(/\d+(?:\.\d+)?/g)[0] : 0.00, 
+      donationAmount: donationAmount,
       text,
       dateDonated,
       attachmentLink
@@ -155,9 +170,11 @@ router.post('/alumni/:id/add-donation/:corrId?', (req, res) => {
     Alumni.findById(req.params.id, function(err, resp) {
       c.save(function(err, res2) {
         resp.donations.push(res2._id);
-        resp.save(function(err, final) {
+        resp.save(function(e3, r4) {
+        resp.recalculate(function(err, final) {
           res.redirect('/protected/alumni/view-donation/' + res2._id)
         });
+        })
       })
     });
   } else {
@@ -167,7 +184,11 @@ router.post('/alumni/:id/add-donation/:corrId?', (req, res) => {
       r.dateDonated = dateDonated;
       r.attachmentLink = attachmentLink;
       r.save(function(err, s) {
-        res.redirect('/protected/alumni/view-donation/' + s._id)
+        Alumni.findById(req.params.id, function(err, resp)  {
+          resp.recalculate(function(e2, r2) {
+            res.redirect('/protected/alumni/view-donation/' + s._id)
+          })
+        })
       });
     })
   }
@@ -177,9 +198,11 @@ router.get('/alumni/delete-donation/:id', (req, res) => {
   Donation.findById(req.params.id, function(e, r) {
     Alumni.findById(r.alumniId, function(e2, r2) {
       r2.donations.remove(r._id);
-      r2.save(function(e3, r3) {
-        r.remove(function(e4, r4) {
-          res.redirect('/protected/alumni/' + r2._id);
+      r2.save(function(e5, r5) {
+        r2.recalculate(function(e3, r3) {
+          r.remove(function(e4, r4) {
+            res.redirect('/protected/alumni/' + r2._id);
+          })
         })
       })
     })

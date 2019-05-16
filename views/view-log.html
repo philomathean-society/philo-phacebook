@@ -1,0 +1,17 @@
+<%- include('partials/head.html') %>
+<%- include('partials/header.html') %>
+<a class="button" href="/protected/logs">Go back</a>
+<% var c = Object.keys(log); %>
+<% for(var i = 0; i < c.length; i++) { %>
+<h3 class="title is-h3"><%= c[i] %></h3>
+<% if (c[i] == 'body' || c[i] == 'comment') { %>
+<% var b = JSON.parse(log[c[i]]); var d = Object.keys(b); %>
+<% for(var j = 0; j < d.length; j++) { %>
+<li><%= d[j] %>:<%- b[d[j]] %></li>
+<% } %>
+<% } else { %>
+<%= log[c[i]] %>
+<% } %>
+<br/><br/>
+<% } %>
+<%- include('partials/footer.html') %>
