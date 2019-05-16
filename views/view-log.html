@@ -1,17 +1,27 @@
 <%- include('partials/head.html') %>
 <%- include('partials/header.html') %>
-<a class="button" href="/protected/logs">Go back</a>
+<br/>
+<a class="button" href="/protected/logs">Go back</a><br/><br/>
+<h1 class="title is-h1">Viewing Individual Log</h1>
+<style>
+  img {
+    max-width: 500px;
+    max-height: 500px;
+  }
+</style>
 <% var c = Object.keys(log); %>
 <% for(var i = 0; i < c.length; i++) { %>
-<h3 class="title is-h3"><%= c[i] %></h3>
-<% if (c[i] == 'body' || c[i] == 'comment') { %>
-<% var b = JSON.parse(log[c[i]]); var d = Object.keys(b); %>
-<% for(var j = 0; j < d.length; j++) { %>
-<li><%= d[j] %>:<%- b[d[j]] %></li>
-<% } %>
-<% } else { %>
-<%= log[c[i]] %>
-<% } %>
-<br/><br/>
+  <% if (c[i].indexOf('_') == -1) { %>
+    <h3 class="subtitle">Field: <%= c[i] %></h3>
+    <% if (c[i] == 'body' || c[i] == 'comment') { %>
+      <% var b = JSON.parse(log[c[i]]); var d = Object.keys(b); %>
+      <% for(var j = 0; j < d.length; j++) { %>
+        <li><%- d[j] %>:<%- JSON.parse(b[d[j]]) %></li>
+      <% } %>
+    <% } else { %>
+    <li><%= log[c[i]] %></li>
+    <% } 
+    } %>
+    <br/>
 <% } %>
 <%- include('partials/footer.html') %>

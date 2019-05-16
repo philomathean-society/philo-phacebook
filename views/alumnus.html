@@ -136,13 +136,6 @@
   </div>
     <script>
     var tagList = <%- JSON.stringify(tags) %>
-    console.log(tagList);
-      <% try { (JSON.parse(person.genComments)); %>
-          var quillContent = JSON.parse(<%-JSON.stringify(person.genComments) %>)
-      <% } catch { %>
-          var quillContent = ''
-      <% } %>
-
     var toolbarOptions = [['header', 'bold', 'italic'], ['link', 'image']
     ];
     var quill = new Quill('#comments', {
@@ -151,7 +144,12 @@
       },
       theme: 'snow',
     });
-    quill.setContents(quillContent, 'api');
+    <% try { (JSON.parse(person.genComments)); %>
+        quill.root.innerHTML = '<%- JSON.parse(person.genComments) %>'
+    <% } catch { %>
+        quill.root.innerHTML = ''
+    <% } %>
+
     $('#disp-comments').html(quill.root.innerHTML);
     var editMode = false;
 
@@ -164,8 +162,7 @@
     function showQuill() {
       $('#comments-container').css('display', 'block');;
       $('#disp-comments').css('display', 'none');;
-      quill.setContents(quillContent, 'api');
-      quill.enable();
+      quill.root.innerHTML = quillContent;
     }
     $(document).ready(function() {
       hideQuill();
@@ -181,7 +178,7 @@
       $('#disp-comments').html(quill.root.innerHTML);
       $('#edit').on('click', function () {
         if (editMode == true) {
-          quillContent = quill.getContents();
+          quillContent = quill.root.innerHTML;
         }
 
         editMode = !editMode;
@@ -199,9 +196,9 @@
             })
           }).then(res => res.json()).then(res => {
             if (res.status != 'success') { alert('Error: Could not save') }
-            $('#edit').text('Edit Comments');
-            hideQuill();
-          }).catch(err => alert(`Error: ${err.message}`));
+              $('#edit').text('Edit Comments');
+              hideQuill();
+            }).catch(err => alert(`Error: ${err.message}`));
         }
       })
     var tl = tagList.map(i => i.tagName);
