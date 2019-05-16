@@ -3,7 +3,7 @@
 <form method="POST">
   <div class="field">
     <label class="label">
-      Title of Correspondence: 
+      Title of Correspondence/Note/Visit: 
     </label>
     <div class="control">
       <input class="input" type="text" name="corrTitle" value="<%= e.corrTitle %>">
@@ -38,6 +38,31 @@
     </div>
   </div>
   <input type="hidden" name="attachmentLink" value="<%= e.attachmentLink %>">
+  
+  <div class="field">
+    <label class="label">
+      Tag for this correspondence/visit (e.g. Archival, Visit, Note...etc)
+    </label>
+    <div class="control">
+      <input class="input" type="text" name="tag" value="<%= e.tag %>">
+    </div>
+  </div>
+
+  <div class="field">
+    <label class="label">
+      Sticky to top of Alumnus/a profile?
+    </label>
+    <div class="control">
+      <label class="radio">
+        <input type="radio" name="sticky" <%= e.sticky ? "checked" : ''%> value="Yes">
+        Yes
+      </label>
+      <label class="radio">
+        <input type="radio" name="sticky" <%= !e.sticky ? "checked" : ''%> value="No">
+        No
+      </label>
+    </div>
+  </div>
 
   <div class="field">
     <div class="control">

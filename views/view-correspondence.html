@@ -8,6 +8,8 @@
 <br/><br/>
 <b class="heading">Title:</b><%= corr.corrTitle %><br/><br/><br/>
 <b class="heading">Date:</b><%= corr.dateCorresponded %><br/><br/><br/>
+<b class="heading">Tag:</b><%= corr.tag %><br/><br/><br/>
+<b class="heading">Sticky:</b><%= corr.sticky ? 'True' : 'False' %><br/><br/><br/>
 <b class="heading">Attachment Links:</b>
 <% var c = corr.attachmentLink.split(','); %>
 <% for (i in c) { %>

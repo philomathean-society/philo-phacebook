@@ -16,7 +16,11 @@
     <% if (c[i] == 'body' || c[i] == 'comment') { %>
       <% var b = JSON.parse(log[c[i]]); var d = Object.keys(b); %>
       <% for(var j = 0; j < d.length; j++) { %>
+      <% try { %>
         <li><%- d[j] %>:<%- JSON.parse(b[d[j]]) %></li>
+        <% }  catch { %>
+        <li><%- d[j] %>:<%-(b[d[j]]) %></li>
+        <% } %>
       <% } %>
     <% } else { %>
     <li><%= log[c[i]] %></li>

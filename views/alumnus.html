@@ -58,6 +58,16 @@
   </div>
   <div class="column">
     <h1 class="title is-h1">Info</h1>
+    <% for (var i = 0; i < person.correspondences.length; i++) { %>
+    <% if (person.correspondences[i].sticky) { %>
+    <div class="notification">
+        Date: <%= person.correspondences[i].dateCorresponded %> | 
+        <b><%= person.correspondences[i].corrTitle %></b>
+        <% if (person.correspondences[i].tag) { %><span class="tag is-primary"><%= person.correspondences[i].tag %></span> <% } %>
+        <a style="float: right" href="/protected/alumni/view-correspondence/<%=person.correspondences[i]._id%>">Read More</a>
+    </div>
+    <% } %>
+    <% } %>
     <p><strong class="heading is-h3">Tags</strong>
           <div  class="field is-grouped is-grouped-multiline">
             <% for (var i = 0; i < person.tags.length; i++) { %>
@@ -101,6 +111,7 @@
             <th>Delete</th>
             <th>Title of Correspondence</th>
             <th>Date</th>
+            <th>Tag</th>
           </tr>
         </thead>
         <% for (var i = 0; i < person.correspondences.length; i++) { %>
@@ -109,6 +120,7 @@
               <td><a href="/protected/alumni/delete-correspondence/<%=person.correspondences[i]._id%>">Delete</a></td>
               <td><%= person.correspondences[i].corrTitle %></td>
               <td><%= person.correspondences[i].dateCorresponded %></td>
+              <td><% if (person.correspondences[i].tag) { %><span class="tag is-primary"><%= person.correspondences[i].tag %></span> <% } %></td>
           </tr>
         <% } %>
       </table>
@@ -149,6 +161,7 @@
     <% } catch { %>
         quill.root.innerHTML = ''
     <% } %>
+    var quillContent = quill.root.innerHTML
 
     $('#disp-comments').html(quill.root.innerHTML);
     var editMode = false;
@@ -167,13 +180,16 @@
     $(document).ready(function() {
       hideQuill();
       $('#update-prof').on('click', function() {
-        fetch('/protected/alumni/<%= person._id %>/update-profile', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ link: $('#profile-pic').val() })
-        }).then(res => location.reload(true));
+        $.ajax({
+            url: '/protected/alumni/<%= person._id %>/update-profile',
+            method: 'POST',
+            data: {
+              link: $('#profile-pic').val()
+            },
+            success: function(d) {
+              location.reload(true)
+            }
+        })
       });
       $('#disp-comments').html(quill.root.innerHTML);
       $('#edit').on('click', function () {
@@ -186,19 +202,18 @@
           showQuill();
           $('#edit').text('Submit edit');
         } else {
-          fetch('/protected/alumni/<%= person._id %>/update-comments', {
+          quillContent = quill.root.innerHTML;
+          $.ajax({
+            url: '/protected/alumni/<%= person._id %>/update-comments',
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
+            data: {
               comment: JSON.stringify(quillContent)
-            })
-          }).then(res => res.json()).then(res => {
-            if (res.status != 'success') { alert('Error: Could not save') }
+            },
+            success: function(d) {
               $('#edit').text('Edit Comments');
               hideQuill();
-            }).catch(err => alert(`Error: ${err.message}`));
+            }
+          })
         }
       })
     var tl = tagList.map(i => i.tagName);
@@ -207,15 +222,16 @@
     });
       $('#add-tag').on('click', function () { 
         console.log();
-          fetch('/protected/alumni/<%= person._id %>/add-tag', {
+        $.ajax({
+            url: '/protected/alumni/<%= person._id %>/add-tag',
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
+            data: {
               t: $('#tag-type').val()
-            })
-          }).then(res => res.json()).then(res => location.reload(true))
+            },
+            success: function(d) {
+              location.reload(true)
+            }
+        })
       })
     })
     </script>

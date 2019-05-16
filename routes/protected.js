@@ -61,6 +61,7 @@ router.post('/alumni/:id/update-profile', (req, res) => {
 
 router.post('/alumni/:id/update-comments', (req, res) => {
   Alumni.findById(req.params.id, function (err, resp) {
+    console.log(req.body);
     resp.genComments = req.body.comment;
     if (err) {
       return res.json({ 'status':'fails' });
@@ -90,17 +91,22 @@ router.get('/alumni/:id/add-correspondence/:corrId?', (req, res) => {
 })
 
 router.post('/alumni/:id/add-correspondence/:corrId?', (req, res) => {
-  let { corrTitle, text, dateCorresponded, attachmentLink } = req.body;
+  let { corrTitle, text, dateCorresponded, attachmentLink, tag, sticky } = req.body;
+  console.log(sticky);
   if (!req.body.edit) {
+    sticky = sticky == 'Yes' ? true : false
     var c = new Corr({
       alumniId: req.params.id,
       corrTitle, 
       text,
       dateCorresponded,
-      attachmentLink
+      attachmentLink,
+      tag,
+      sticky
     })
     Alumni.findById(req.params.id, function(err, resp) {
-      c.save(function(err, res2) {
+      c.save(function(e2, res2) {
+        if (e2) { console.log(e2) }
         resp.correspondences.push(res2._id);
         resp.save(function(err, final) {
           res.redirect('/protected/alumni/view-correspondence/' + res2._id)
@@ -113,6 +119,8 @@ router.post('/alumni/:id/add-correspondence/:corrId?', (req, res) => {
       r.text = text;
       r.dateCorresponded = dateCorresponded;
       r.attachmentLink = attachmentLink;
+      r.tag = tag;
+      r.sticky = sticky == 'Yes';
       r.save(function(err, s) {
         res.redirect('/protected/alumni/view-correspondence/' + s._id)
       });

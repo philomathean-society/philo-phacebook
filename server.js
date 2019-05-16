@@ -28,8 +28,8 @@ app.use(cookieSession({
 }))
 
 app.use(function(req, res, next){
-  req.flash = function(info, message) {
-    req.session.messages = [{ info, message }]
+  req.flash = function(type, message) {
+    req.session.messages = [{ type, message }]
     res.locals.messages = req.session.messages
   }
   next();
