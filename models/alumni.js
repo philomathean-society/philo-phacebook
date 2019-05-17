@@ -31,7 +31,7 @@ alumniSchema.methods.recalculate = function(cb) {
           return 0;
         }
       })
-      self.donorTotal = t.reduce((a, v) => a + v);
+      self.donorTotal = t.reduce((a, v) => a + v, 0);
       self.donorTotal = self.donorTotal.toFixed(2);
       console.log(this.donorTotal);
       self.save(function(err, r2) {
