@@ -8,6 +8,17 @@
   </div>
 </div>
 
+<div class="field">
+  <label class="label">Filter by tag:</label>
+  <% for (var i = 0; i < tags.length; i++) { %>
+  <label class="checkbox">
+    <input type="checkbox" name="filter" value="<%= tags[i].tagName %>">
+    <%= tags[i].tagName %>
+  </label>&nbsp;&nbsp;&nbsp;&nbsp;
+  <% } %>
+</div>
+
+
 <div style="overflow-x:auto;">
 <table id="table" class="table is-striped sortable">
 
@@ -26,6 +37,7 @@ table.sortable thead {
   <script>
     var newTableObject = null;
     var people = <%- JSON.stringify(people) %>
+    window.data = people
     function debounce(func, wait, immediate) {
       var timeout;
       return function() {
@@ -53,16 +65,43 @@ table.sortable thead {
       $('#any').on('keyup', debounce(function() {
         if ($('#any').val().length > 3) {
           var res = fuse.search($('#any').val());
-          console.log(res.slice(0, 50));
+          window.data = res.slice(0, 50);
           renderTable(res.slice(0, 50));
         } else if ($('#any').val().length == 0) {
+          window.data = people;
           renderTable(people);
         }
       }, 500));
     })
 
+    $("input[name='filter']").on('click', function() {
+      renderTable(window.data);
+    })
+
+    function applyFilter(data) {
+      console.log(data);
+      var favorite = [];
+      $.each($("input[name='filter']:checked"), function(){            
+        favorite.push($(this).val());
+      });
+      console.log(favorite);
+      if (favorite.length == 0) {
+        return data;
+      } else {
+        return data.filter((i) => {
+          var include = false;
+          i.tags.forEach(j => {
+            if (favorite.indexOf(j.tagName) > -1) { 
+              include= true
+            }
+          })
+          return include;
+        })
+      }
+    }
     function renderTable(data) {
-      var people = data;
+      var people = applyFilter(data);
+      console.log(people);
       var t = document.querySelector('table');
       t.innerHTML = '';
       var c = document.createDocumentFragment();

@@ -30,7 +30,9 @@ router.get('/logs/view-log/:id', (req, res) => {
 
 router.get('/view', (req, res) => {
   Alumni.find({}).populate('tags').exec(function(err, resp) {
-    res.render('view', { people: resp }); 
+    Tag.find({}, function(e2, r) {
+      res.render('view', { people: resp, tags: r }); 
+    })
   });
 });
 
