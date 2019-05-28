@@ -14,6 +14,7 @@
   <label class="checkbox">
     <input type="checkbox" name="filter" value="<%= tags[i].tagName %>">
     <%= tags[i].tagName %>
+    <a class="delete" href="/protected/alumni/remove-tag-from-all/<%= tags[i]._id %>"></a>
   </label>&nbsp;&nbsp;&nbsp;&nbsp;
   <% } %>
 </div>
@@ -99,6 +100,13 @@ table.sortable thead {
         })
       }
     }
+    function JSONParse(str) {
+      try {
+        return JSON.parse(str)
+      } catch {
+        return str
+      }
+    }
     function renderTable(data) {
       var people = applyFilter(data);
       console.log(people);
@@ -138,8 +146,8 @@ table.sortable thead {
                           <td>${ people[p].middleName }</td>
                           <td>${ people[p].lastName }</td>
                           <td>${ people[p].gradYear }</td>
-                          <td>${ people[p].pennCareer }</td>
-                          <td>${ people[p].postPennCareer }</td>
+                          <td>${ JSONParse(people[p].pennCareer) }</td>
+                          <td>${ JSONParse(people[p].postPennCareer) }</td>
                           
         `;
         r.appendChild(e2);

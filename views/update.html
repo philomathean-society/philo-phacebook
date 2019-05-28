@@ -53,7 +53,7 @@ Updated <span id="total">0</span> of <span id="all">0</span> entries.
             $.ajax({
               url: "/protected/update-sheet",
               method: 'POST',
-              body: i,
+              data: i,
               success: function(d) {
                 totalCount++;
                 updateTotalCount();
@@ -67,6 +67,10 @@ Updated <span id="total">0</span> of <span id="all">0</span> entries.
     function updateTotalCount() {
       document.getElementById("total").textContent = totalCount;
       document.getElementById("all").textContent = allCount;
+      if (totalCount == allCount) {
+        alert('Done updating!');
+        window.location.href = "/protected/alumni/view";
+      }
     }
   </script>
 <%- include('partials/footer.html') %>

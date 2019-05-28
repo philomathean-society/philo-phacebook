@@ -81,27 +81,41 @@
             <% } %>
           </div>
     <br/>
-    <p><strong class="heading is-h3">General Comments + Contact Info <em>(add more by clicking "Edit")</em></strong>:<br>
+    <p><strong class="heading is-h3">General Comments + Contact Info <em>(add more by clicking "Edit"):</em></strong><br>
     <div id="disp-comments" style="display: block"></div>
     <div id="comments-container">
-    <div id="comments"></div>
+      <div id="comments"></div>
     </div>
     <br/>
     <button class="button" id="edit">Edit Comments</button>
     <br/>
     <br/>
-    <p><strong class="heading is-h3">Penn/Philo Career:</strong>
+    <p><strong class="heading is-h3">Penn/Philo Career (may not be up to date w/Recorders' Rolls):</strong>
     <br/>
-    Admitted into Philo <%= person.admitYear %>.
-    <%= person.pennCareer %></p>
+    Admitted into Philo <%= person.admitYear %>.<hr>
+    <div id="disp-comments-penn" style="display: block"></div>
+    <div id="comments-container-penn">
+      <div id="comments-penn">
+      </div>
+    </div>
     <br/>
-    <p><strong class="heading is-h3">Post Penn Career:</strong><br/>
-    <% if (person.postPennCareer) { %>
-      <%= person.postPennCareer %>
-    <% } else { %>
-      No Info
-    <% } %>
-    </p>
+    <button class="button" id="edit"  data-type="penn">Edit Penn/Philo Career</button>
+    <br/>
+    <br/>
+
+
+    <p><strong class="heading is-h3">Post Penn Career (may not be up to date w/Recorders' Rolls):</strong>
+    <br/>
+    <div id="disp-comments-post" style="display: block"></div>
+    <div id="comments-container-post">
+      <div id="comments-post">
+      </div>
+    </div>
+    <br/>
+    <button class="button" id="edit"  data-type="post">Edit Post-Penn Career</button>
+    <br/>
+    <br/>
+
     <br/>
       <p><strong class="heading is-h3">Correspondences/Note/Visits/Archival (<a href="/protected/alumni/<%= person._id %>/add-correspondence">Add Record</a>):</strong>
       <table class="table" style="width: 100%">
@@ -148,11 +162,23 @@
   </div>
     <script>
     var tagList = <%- JSON.stringify(tags) %>
-    var toolbarOptions = [['header', 'bold', 'italic'], ['link', 'image']
-    ];
+    var toolbarOptions = [['header', 'bold', 'italic'], ['link', 'image']];
+    var toolbarAlt = [['link']];
     var quill = new Quill('#comments', {
       modules: {
         toolbar: toolbarOptions
+      },
+      theme: 'snow',
+    });
+    var quillPenn = new Quill('#comments-penn', {
+      modules: {
+        toolbar: toolbarAlt
+      },
+      theme: 'snow',
+    });
+    var quillPost = new Quill('#comments-post', {
+      modules: {
+        toolbar: toolbarAlt
       },
       theme: 'snow',
     });
@@ -163,22 +189,43 @@
     <% } %>
     var quillContent = quill.root.innerHTML
 
-    $('#disp-comments').html(quill.root.innerHTML);
-    var editMode = false;
+    <% try { (JSON.parse(person.pennCareer)); %>
+        quillPenn.root.innerHTML = '<%- JSON.parse(person.pennCareer) %>'
+    <% } catch { %>
+        quillPenn.root.innerHTML = '<%- person.pennCareer %>'
+    <% } %>
+    var quillContentPenn = quillPenn.root.innerHTML
 
-    function hideQuill() {
-      $('#disp-comments').css('display', 'block');
-      $('#disp-comments').html(quill.root.innerHTML);
-      $('#comments-container').css('display', 'none');
+    <% try { (JSON.parse(person.postPennCareer)); %>
+        quillPost.root.innerHTML = '<%- JSON.parse(person.postPennCareer) %>'
+    <% } catch { %>
+        quillPost.root.innerHTML = '<%- person.postPennCareer %>'
+    <% } %>
+    var quillContentPost = quillPost.root.innerHTML
+
+    $('#disp-comments').html(quill.root.innerHTML);
+    var editMode = {'comment' : false, 'penn': false, 'post': false};
+
+    function hideQuill(type) {
+      var append = type ? '-' + type : ''
+      var quillType = type ? (type == 'penn' ? quillPenn : quillPost) : quill
+      $('#disp-comments' + append).css('display', 'block');
+      $('#disp-comments' + append).html(quillType.root.innerHTML);
+      $('#comments-container' + append).css('display', 'none');
     }
 
-    function showQuill() {
-      $('#comments-container').css('display', 'block');;
-      $('#disp-comments').css('display', 'none');;
-      quill.root.innerHTML = quillContent;
+    function showQuill(type) {
+      var append = type ? '-' + type : ''
+      var quillType = type ? (type == 'penn' ? quillPenn : quillPost) : quill
+      var quillContentType = type ? (type == 'penn' ? quillContentPenn : quillContentPost) : quillContent
+      $('#comments-container' + append).css('display', 'block');;
+      $('#disp-comments' + append).css('display', 'none');;
+      quillType.root.innerHTML = quillContentType;
     }
     $(document).ready(function() {
       hideQuill();
+      hideQuill('penn');
+      hideQuill('post');
       $('#update-prof').on('click', function() {
         $.ajax({
             url: '/protected/alumni/<%= person._id %>/update-profile',
@@ -191,27 +238,33 @@
             }
         })
       });
-      $('#disp-comments').html(quill.root.innerHTML);
-      $('#edit').on('click', function () {
+      $('body').on('click', '#edit', function () {
+        console.log('hi');
+        var type = $(this).data('type');
+        var quillType = type ? (type == 'penn' ? quillPenn : quillPost) : quill
+        var quillContentType = type ? (type == 'penn' ? quillContentPenn : quillContentPost) : quillContent
+        var qString = type ? type : 'comments'
+        var eString = type ? (type == 'penn' ? 'Penn/Philo Career' : 'Post-Penn Career') : 'Comments'
         if (editMode == true) {
-          quillContent = quill.root.innerHTML;
+          quillContentType = quillType.root.innerHTML;
         }
-
-        editMode = !editMode;
-        if (editMode == true) {
-          showQuill();
-          $('#edit').text('Submit edit');
+        modeType = type ? type  : 'comment'
+        editMode[modeType] = !editMode[modeType];
+        self = this;
+        if (editMode[modeType] == true) {
+          showQuill(type);
+          $(self).text('Submit edit');
         } else {
-          quillContent = quill.root.innerHTML;
+          quillContentType = quillType.root.innerHTML;
           $.ajax({
-            url: '/protected/alumni/<%= person._id %>/update-comments',
+            url: '/protected/alumni/<%= person._id %>/update-' + qString,
             method: 'POST',
             data: {
-              comment: JSON.stringify(quillContent)
+              comment: JSON.stringify(quillContentType)
             },
             success: function(d) {
-              $('#edit').text('Edit Comments');
-              hideQuill();
+              $(self).text('Edit ' + eString);
+              hideQuill(type);
             }
           })
         }
