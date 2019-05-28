@@ -1,0 +1,11 @@
+<%- include('partials/head.html') %>
+<%- include('partials/header.html') %>
+<h1 class="title is-h1">Manage Users</h1>
+
+<% for(var i = 0; i < users.length; i++) { %>
+<li>Username: <%= users[i].username %> | Admin?: <%= users[i].isAdmin.toString() %> | 
+
+      <a href="/account/manage-users/<%= users[i]._id%>/delete">Delete User</a> |
+      <a href="/account/manage-users/<%= users[i]._id%>/toggle-admin">Toggle Admin Perms for User</a> |
+<% } %>
+<%- include('partials/footer.html') %>

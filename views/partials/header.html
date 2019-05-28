@@ -1,5 +1,5 @@
 <body>
-<div class="container is-fluid">
+<div class="container">
 <nav class="navbar" role="navigation" aria-label="main navigation" style="margin-top: 10px; margin-bottom: 20px;">
   <div class="navbar-brand" >
     <a class="navbar-item" href="/" style="border-right: 1px solid #CCC">
@@ -24,6 +24,9 @@
       </a>
       <a class="navbar-item" href="/protected/logs">
         View Logs
+      </a>
+      <a class="navbar-item" href="/account/manage-users">
+        Manage Users
       </a>
 
     </div>
@@ -66,5 +69,17 @@
   </script>
 <% } %>
   <script>
+  $(document).ready(function() {
+
+    // Check for click events on the navbar burger icon
+    $(".navbar-burger").click(function() {
+      console.log('toggled menu');
+      // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
+      $(".navbar-burger").toggleClass("is-active");
+      $(".navbar-menu").toggleClass("is-active");
+
+    });
+  });
     console.log(<%- JSON.stringify(locals._locals) %>);
   </script>
+
