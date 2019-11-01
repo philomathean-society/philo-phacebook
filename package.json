@@ -16,7 +16,7 @@
     "ejs": "^2.6.1",
     "express": "^4.16.4",
     "express-flash": "0.0.2",
-    "mongoose": "^5.4.21"
+    "mongoose": "^5.7.5"
   },
   "devDependencies": {
     "nodemon": "^1.19.0"
